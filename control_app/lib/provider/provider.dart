@@ -1,11 +1,9 @@
+import 'package:control_app/models/point.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
 class Myprovider extends ChangeNotifier {
-  List<int> xList = [];
-  List<int> yList = [];
-
-  // int _status = 0;
+  List<Point> _points = [];
 
   BluetoothConnection _connection;
 
@@ -16,17 +14,16 @@ class Myprovider extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<int> get getXList => this.xList;
+  get getPoints => this._points;
 
-  set setXList(List<int> xList) {
-    this.xList = xList;
+  set setPoints(List<Point> points) {
+    this._points = points;
     notifyListeners();
   }
 
-  List<int> get getYList => this.yList;
+  addPoint(Point point) {
+    this._points.add(point);
 
-  set setYList(List<int> yList) {
-    this.yList = yList;
     notifyListeners();
   }
 }
