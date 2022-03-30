@@ -16,11 +16,10 @@ class LiveGraph extends StatefulWidget {
 class _LiveGraphState extends State<LiveGraph> {
   @override
   Widget build(BuildContext context) {
-    return Center(
-        child: Consumer<Myprovider>(
-            builder: (context, value, child) => Container(
-                    child: LineChartWidget(
-                  points: value.getPoints,
-                ))));
+    return Consumer<Myprovider>(
+        builder: (context, value, child) => Container(
+                child: LineChartWidget(
+              points: value.getPoints,
+            )));
   }
 }

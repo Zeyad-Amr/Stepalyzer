@@ -5,6 +5,8 @@ import 'package:control_app/provider/provider.dart';
 import 'package:control_app/screens/analysis.dart';
 import 'package:control_app/screens/livegraph.dart';
 import 'package:control_app/screens/normal.dart';
+import 'package:control_app/widgets/line_titles.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
@@ -21,75 +23,12 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List<Point> points = [
-    Point(0, 3),
-    Point(0.5, 1.9),
-    Point(1, 1.5),
-    Point(1.5, 2.1),
-    Point(2, 2.5),
-    Point(2.5, 3.9),
-    Point(3, 3.5),
-    Point(3.5, 4.1),
-    Point(4, 4.5),
-    Point(4.5, 3.9),
-    Point(5, 3.5),
-    Point(5.5, 2.1),
-    Point(6, 2.5),
-    Point(6.5, 3.9),
-    Point(7, 1.5),
-    Point(7.5, 3),
-    Point(8, 1.9),
-    Point(8.5, 1.5),
-    Point(9, 2.1),
-    Point(9.5, 2.5),
-    Point(10, 3.9),
-    Point(10.5, 3.5),
-    Point(11, 4.1),
-    Point(11.5, 4.5),
-    Point(12, 3.9),
-    Point(12.5, 3.5),
-    Point(13, 2.1),
-    Point(13.5, 2.5),
-    Point(14, 3.9),
-    Point(15, 1.5),
-    Point(15.5, 3),
-    Point(16, 1.9),
-    Point(16.5, 1.5),
-    Point(17, 2.1),
-    Point(17.5, 2.5),
-    Point(18, 3.9),
-    Point(18.5, 3.5),
-    Point(19, 4.1),
-    Point(19.5, 4.5),
-    Point(20, 3.9),
-    Point(20.5, 3.5),
-    Point(21, 2.1),
-    Point(21.5, 2.5),
-    Point(22, 3.9),
-    Point(22.5, 1.5),
-    Point(23, 3),
-    Point(23.5, 1.9),
-    Point(24, 1.5),
-    Point(24.5, 2.1),
-    Point(25, 2.5),
-    Point(25.5, 3.9),
-    Point(26, 3.5),
-    Point(26.5, 4.1),
-    Point(27, 4.5),
-    Point(27.5, 3.9),
-    Point(28, 3.5),
-    Point(28.5, 2.1),
-    Point(29, 2.5),
-    Point(29.5, 3.9),
-    Point(30, 1.5)
-  ];
-
   int _selectedIndex = 0;
   BluetoothConnection connection;
   static List<Widget> _widgetOptions = <Widget>[
-    NormalScreen(),
-    LiveGraph(),
     AnalysisScreen(),
+    LiveGraph(),
+    NormalScreen(),
     DevelopersScreen(),
   ];
 
@@ -112,6 +51,11 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      var provider = Provider.of<Myprovider>(context, listen: false);
+      provider.addPoint(Point(0, 0));
+    });
 
     BluetoothConnection.toAddress(widget.server.address).then((_connection) {
       print('Connected to the device');
@@ -156,6 +100,18 @@ class _HomeState extends State<Home> {
 
           level = x;
           print('XXXXX' + level);
+
+          // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+          //   var provider = Provider.of<Myprovider>(context, listen: false);
+          //   provider.addPoint(
+          //       Point((provider.getPoints.length + 1), int.parse(level)));
+
+          // });
+
+          if (!ispaused) {
+            spots.add(FlSpot(
+                (spots.length + 1).toDouble(), int.parse(level).toDouble()));
+          }
         } catch (e) {
           // level = '00.0';
         }
@@ -241,9 +197,15 @@ class _HomeState extends State<Home> {
   //   }
   // }
 
+  final List<Color> gradientColors = [
+    const Color(0xff23b6e6),
+    const Color(0xff02d39a),
+  ];
+  List<FlSpot> spots = [FlSpot(0, 0)];
+  bool ispaused = false;
   @override
   Widget build(BuildContext context) {
-    var myProv = Provider.of<Myprovider>(context, listen: false);
+    // var myProv = Provider.of<Myprovider>(context, listen: false);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -256,8 +218,121 @@ class _HomeState extends State<Home> {
             'assets/logo.png',
           ),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: IconButton(
+              icon: !ispaused
+                  ? Icon(Icons.pause_rounded)
+                  : Icon(Icons.play_arrow_rounded),
+              color: ispaused ? Colors.green : Colors.orange,
+              onPressed: () {
+                setState(() {
+                  ispaused = !ispaused;
+                });
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: IconButton(
+              icon: Icon(Icons.clear_outlined),
+              color: Colors.red,
+              onPressed: () {
+                setState(() {
+                  spots = [FlSpot(0, 0)];
+                });
+              },
+            ),
+          ),
+        ],
       ),
-      body: _widgetOptions.elementAt(_selectedIndex),
+      body: _selectedIndex == 1
+          ? Directionality(
+              textDirection: TextDirection.rtl,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 30, 20, 10),
+                  child: Container(
+                    width:
+                        MediaQuery.of(context).size.width * spots.length / 12,
+                    height: MediaQuery.of(context).size.height,
+                    child: LineChart(
+                      LineChartData(
+                        minX: 0,
+                        maxX: spots.length.toDouble(),
+                        minY: -200,
+                        maxY: 1200,
+                        titlesData: LineTitles.getTitleData(),
+                        axisTitleData: FlAxisTitleData(
+                          show: true,
+                          bottomTitle: AxisTitle(
+                            showTitle: true,
+                            titleText: 'Time x10^-2 (sec)',
+                            textStyle: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          ),
+                          leftTitle: AxisTitle(
+                            showTitle: true,
+                            titleText: 'Voltage (v)',
+                            textStyle: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                        gridData: FlGridData(
+                          show: true,
+                          // checkToShowHorizontalLine: (value) => value % 100 == 0,
+                          horizontalInterval: 100,
+
+                          getDrawingHorizontalLine: (value) {
+                            return FlLine(
+                              color: Colors.grey[400],
+                              strokeWidth: 1,
+                            );
+                          },
+                          drawVerticalLine: true,
+                          getDrawingVerticalLine: (value) {
+                            return FlLine(
+                              color: Colors.grey[400],
+                              strokeWidth: 1,
+                            );
+                          },
+                        ),
+                        borderData: FlBorderData(
+                          show: true,
+                          border: Border.all(
+                              color: const Color(0xff37434d), width: 1),
+                        ),
+                        lineBarsData: [
+                          LineChartBarData(
+                            spots: spots,
+                            isCurved: true,
+                            colors: gradientColors,
+                            barWidth: 5,
+
+                            // dotData: FlDotData(show: false),
+                            belowBarData: BarAreaData(
+                              show: true,
+                              colors: gradientColors
+                                  .map((color) => color.withOpacity(0.3))
+                                  .toList(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            )
+          : _widgetOptions.elementAt(_selectedIndex),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.grey[900],
@@ -290,16 +365,16 @@ class _HomeState extends State<Home> {
               color: Colors.white,
               tabs: [
                 GButton(
-                  icon: Icons.auto_graph_rounded,
-                  text: 'Normal',
+                  icon: Icons.warning_amber_outlined,
+                  text: 'Restrictions',
                 ),
                 GButton(
                   icon: Icons.search_rounded,
                   text: 'Examining',
                 ),
                 GButton(
-                  icon: Icons.analytics_outlined,
-                  text: 'Analysis',
+                  icon: Icons.auto_graph_rounded,
+                  text: 'Normal',
                 ),
                 GButton(
                   icon: Icons.developer_mode_rounded,
@@ -311,7 +386,7 @@ class _HomeState extends State<Home> {
                 setState(() {
                   _selectedIndex = index;
                 });
-                myProv.setPoints = points;
+                // myProv.setPoints = [Point(0, 0)];
               },
             ),
           ),

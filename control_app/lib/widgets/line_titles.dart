@@ -19,6 +19,7 @@ class LineTitles {
         ),
         leftTitles: SideTitles(
           showTitles: true,
+          interval: 100,
           getTextStyles: (value) => const TextStyle(
             color: Color(0xff67727d),
             fontWeight: FontWeight.bold,

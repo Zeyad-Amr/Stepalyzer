@@ -1,5 +1,5 @@
 class Point {
-  double x;
-  double y;
+  int x;
+  int y;
   Point(this.x, this.y);
 }

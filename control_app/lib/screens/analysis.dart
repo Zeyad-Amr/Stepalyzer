@@ -61,6 +61,60 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Container(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 25, 8, 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 8, 20),
+                  child: Container(
+                    width: 8,
+                    height: 25,
+                    color: Colors.red,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+                  child: Text('Restrictions',
+                      style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black)),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
+              child: Text(
+                  '1. For usage, the patient is suffering from an injury causes knee Flexion or Extension issues.',
+                  style: TextStyle(fontSize: 20, color: Colors.black)),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
+              child: Text(
+                  '2. Knee adduction or abduction are excluded from our analysis.',
+                  style: TextStyle(fontSize: 20, color: Colors.black)),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
+              child: Text(
+                  '3. By using an elastic knee band and by fixing the used rounded sensor (FSR) pointing its rounded head slightly beneath the patella’s knee.',
+                  style: TextStyle(fontSize: 20, color: Colors.black)),
+            ),
+            Expanded(
+                child: Center(
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.6,
+                child: Image.asset('assets/warning.png'),
+              ),
+            ))
+          ],
+        ),
+      ),
+    );
   }
 }

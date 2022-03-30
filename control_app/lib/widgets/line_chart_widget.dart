@@ -23,7 +23,8 @@ class _LineChartWidgetState extends State<LineChartWidget> {
   void initState() {
     super.initState();
 
-    widget.points.forEach((e) => spots.add(FlSpot(e.x, e.y)));
+    widget.points
+        .forEach((e) => spots.add(FlSpot(e.x.toDouble(), e.y.toDouble())));
   }
 
   @override
@@ -31,29 +32,53 @@ class _LineChartWidgetState extends State<LineChartWidget> {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(0, 30, 20, 0),
+        padding: const EdgeInsets.fromLTRB(10, 30, 20, 10),
         child: Container(
-          width: MediaQuery.of(context).size.width * 5,
+          width: MediaQuery.of(context).size.width * spots.length / 12,
           height: MediaQuery.of(context).size.height,
           child: LineChart(
             LineChartData(
               minX: 0,
               maxX: spots.length.toDouble(),
-              minY: 0,
-              maxY: 6,
+              minY: -200,
+              maxY: 1200,
               titlesData: LineTitles.getTitleData(),
+              axisTitleData: FlAxisTitleData(
+                show: true,
+                bottomTitle: AxisTitle(
+                  showTitle: true,
+                  titleText: 'Time x10^-2 (sec)',
+                  textStyle: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+                leftTitle: AxisTitle(
+                  showTitle: true,
+                  titleText: 'Voltage (v)',
+                  textStyle: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
               gridData: FlGridData(
                 show: true,
+                // checkToShowHorizontalLine: (value) => value % 100 == 0,
+                horizontalInterval: 100,
+
                 getDrawingHorizontalLine: (value) {
                   return FlLine(
-                    color: const Color(0xff37434d),
+                    color: Colors.grey[400],
                     strokeWidth: 1,
                   );
                 },
                 drawVerticalLine: true,
                 getDrawingVerticalLine: (value) {
                   return FlLine(
-                    color: const Color(0xff37434d),
+                    color: Colors.grey[400],
                     strokeWidth: 1,
                   );
                 },
@@ -68,6 +93,7 @@ class _LineChartWidgetState extends State<LineChartWidget> {
                   isCurved: true,
                   colors: gradientColors,
                   barWidth: 5,
+
                   // dotData: FlDotData(show: false),
                   belowBarData: BarAreaData(
                     show: true,
